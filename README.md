@@ -1,0 +1,1 @@
+A web-based platform where students can join live tutoring sessions with teachers. The system allows teachers to schedule lessons, students to join, and real-time interaction via video, chat, and shared whiteboards.
