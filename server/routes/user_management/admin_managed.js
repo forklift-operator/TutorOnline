@@ -7,14 +7,14 @@ const AdminRouter = Router();
 
 AdminRouter.get("/users", verifyToken, checkRole("Admin"), async (req, res) => {
 
-    const collections = await db.collection("users"); 
+    const collections = db.collection("users"); 
     const result = await collections.find({}).toArray(); 
-    res.send(result).status(200);
+    res.status(200).json(result);
     
 })
 
 AdminRouter.put("/users/:id", verifyToken, checkRole("Admin"), async (req, res) => {
-    const collections = await db.collection("users");
+    const collections = db.collection("users");
     const query = { _id: new ObjectId(req.params.id) };
     const {username, email, role, ...other} = req.body;
 
@@ -28,13 +28,17 @@ AdminRouter.put("/users/:id", verifyToken, checkRole("Admin"), async (req, res) 
         }
     };
 
-    collections.updateOne(query, newVals, async (e, r) => {
-        if (e || r.updatedCount === 0) {
+    try{
+        const result = await collections.updateOne(query, newVals)
+
+        if (result.matchedCount === 0 || res.modifiedCount === 0) {
             return res.status(404).json({ message: "User not found" });
         }
         const updated = await collections.findOne(query);
         res.status(200).json({updated});
-    });
+    } catch (e) {
+        res.status(500).json({ message: "Error updating user: ", e })
+    }
 
 })
 
@@ -42,13 +46,53 @@ AdminRouter.delete("/users/:id", verifyToken, checkRole("Admin"), async (req, re
     const collection = db.collection("users");
     const query = { _id: new ObjectId(req.params.id) };
 
-    await collection.deleteOne(query, (e, r) => {
-        if (e || r.deletedCount === 0) {
-            return res.status(404).json({ message: "User not found"});
+    try {
+        const result = await collection.deleteOne(query);
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ message: "User not found" });
         }
+        res.status(200).json({ message: "Successful deletion" });
+    } catch (e) {
+        res.status(500).json({ message: "An error occurred while deleting the user", error: e });
+    }
+})
 
-        res.status(200).json({ message: "Successful deletion"});
-    });
+AdminRouter.get("/reports", verifyToken, checkRole("Admin"), async (req, res) => {
+    const collections = db.collection("reports");
+
+    try {
+        const reports = await collections.find({}).toArray();
+        res.status(200).json(reports);
+    } catch (e) {
+        res.status(500).json({ message: "Error while fetching reports: ", e })
+    }
+})
+
+AdminRouter.get("/reports/:user_id", verifyToken, checkRole("Admin"), async (req, res) => {
+    const collections = db.collection("reports");
+    const query = { toUser: new ObjectId(req.params.user_id) };
+    
+    try {
+        const results = await collections.find(query).toArray();
+        res.status(200).json(results);
+    } catch (e) {
+        res.status(500).json({ message: "An error occurred while fetching reports", e });
+    }
+})
+
+AdminRouter.put("/reports/:report_id", async (req, res) => {
+    const collections = db.collection("reports");
+    const query = { _id: new ObjectId(req.params.report_id) };
+
+    try {
+        const result = await collections.deleteOne(query);
+        if (result.deletedCount === 0) {
+            res.json(404).json({ message: "Report not found" })
+        }
+        res.status(200).json({ message: "Report successfully deleted" })
+    } catch (e) {
+        res.status(500).json({ message: "Error deleting report:", e })
+    }
 })
 
 export {AdminRouter};
