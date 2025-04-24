@@ -13,6 +13,7 @@ AdminRouter.get("/users", verifyToken, checkRole("Admin"), async (req, res) => {
 
 AdminRouter.put("/users/:id", verifyToken, checkRole("Admin"), async (req, res) => {
     const collections = db.collection("users");
+    const collections = db.collection("users");
     const query = { _id: new ObjectId(req.params.id) };
     const {username, email, role, ...other} = req.body;
 
@@ -26,6 +27,10 @@ AdminRouter.put("/users/:id", verifyToken, checkRole("Admin"), async (req, res) 
         }
     };
 
+    try{
+        const result = await collections.updateOne(query, newVals)
+
+        if (result.matchedCount === 0 || res.modifiedCount === 0) {
     try{
         const result = await collections.updateOne(query, newVals)
 
