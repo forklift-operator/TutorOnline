@@ -7,7 +7,7 @@ import { ObjectId } from "mongodb";
 
 const CourseRouter = Router();
 
-CourseRouter.get("/courses/:teacherId", verifyToken, async (req, res) => {
+CourseRouter.get("/teachers/:teacherId/courses", verifyToken, async (req, res) => {
     console.log("getting courses");
 
     try {
@@ -19,25 +19,25 @@ CourseRouter.get("/courses/:teacherId", verifyToken, async (req, res) => {
         }
         return res.status(200).json(courses);
     } catch (e) {
-        return res.status(500).json({ message: "Error getting courses: " + e });
+        return res.status(500).json({ error: "Error getting courses: " + e });
     }
 })
 
-CourseRouter.post("/create/course", verifyToken, checkRole("Teacher"), async (req, res) => {
+CourseRouter.post("/courses", verifyToken, checkRole("Teacher"), async (req, res) => {
     try {
-        const userCourses = await CourseModel.find({ teacher: new ObjectId(req.user.id) })
+        const userCourses = await CourseModel.find({ teacher: new ObjectId(req.user.id) });
         
-        if(userCourses.length >= 10) return res.status(401).json({ error: "Can't create more than 10 courses. Delete some!" });
+        if (userCourses.length >= 10) return res.status(401).json({ error: "Can't create more than 10 courses. Delete some!" });
             
         const course = new CourseModel(req.body);
         await course.save();
-        res.status(200).json( course );
+        res.status(200).json(course);
     } catch (e) {
         res.status(500).json({ error: "Failed to create course " + e.message });
     }
-})
+});
 
-CourseRouter.delete("/course/:id", verifyToken, checkRole("Teacher"), async (req, res) => {
+CourseRouter.delete("/courses/:id", verifyToken, checkRole("Teacher"), async (req, res) => {
     try {
         const course = await CourseModel.findById( req.params.id );
         if(!course) return res.status(404).json({ error: "Course not found" });
@@ -51,7 +51,7 @@ CourseRouter.delete("/course/:id", verifyToken, checkRole("Teacher"), async (req
     }
 })
 
-CourseRouter.post("/create/lesson/:courseId", verifyToken, checkRole("Teacher"), async (req, res) => {
+CourseRouter.post("/courses/:courseId/lessons", verifyToken, checkRole("Teacher"), async (req, res) => {
     try {
         const course = await CourseModel.findById(req.params.courseId);
         if (!course) return res.status(404).json({ error: "Course not found" });
@@ -70,26 +70,31 @@ CourseRouter.post("/create/lesson/:courseId", verifyToken, checkRole("Teacher"),
 
         res.status(200).json({ message: "Lesson added successfully", lesson });
     } catch (e) {
-        console.log(e);
+        console.log(e.message);
         
-        res.status(500).json({ error: "Failed to create lesson " + e.message });
+        res.status(500).json({ error: "Failed to create lesson: " + e.message });
     }
 });
 
 
-CourseRouter.get("/rooms", verifyToken, async (req, res) => {
-    console.log("getting rooms");
-    const collections = db.collection("sessions");
+CourseRouter.get("/courses/:courseId/lessons/:lessonId", verifyToken, async (req, res) => {
+    if (!ObjectId.isValid(req.params.courseId) || !ObjectId.isValid(req.params.lessonId)){
+        return res.status(400).json({ error: "Course or lesson ID invalid" })
+    } 
     
-
+    const collections = db.collection("courses");
+    
     try {
-        const rooms = await collections.find({}).toArray();
-        if(!rooms) return res.status(200).json({ message: "No rooms" });
-        return res.status(200).json(rooms);
+        const course = await CourseModel.findById(req.params.courseId);
+        if (!course) return res.status(404).json({ error: "Course(" + req.params.courseId + ") not found" })
+        const lesson = course.lessons.find(lesson => lesson._id.toString() === req.params.lessonId);
+        if (!lesson) return res.status(404).json({ error: "Lesson(" + req.params.lessonId + ") not found" });
+
+        return res.status(200).json(lesson);
     } catch (e) {
         console.log(e);
         
-        return res.status(500).json({ message: "Error getting rooms: " + e });
+        return res.status(500).json({ error: "Server error: " + e });
     }
 })
 

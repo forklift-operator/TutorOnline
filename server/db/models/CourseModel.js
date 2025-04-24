@@ -5,6 +5,7 @@ const LessonSchema = new mongoose.Schema({
     description:{ type: String },
     video:{ type: String },
     whiteboard:{ type: String },
+    isOpen:{ type: Boolean, default: false },
     activeUsers:[{
         user: { type: mongoose.Types.ObjectId, ref: "User", required: true },
         peerId: { type: String, required: true },
