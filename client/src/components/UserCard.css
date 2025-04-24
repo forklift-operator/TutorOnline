@@ -1,0 +1,131 @@
+.user-card {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    width: 80%;
+    height: fit-content;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    background-color: #282828;
+}
+
+.user-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 10px;
+    height: 100%;
+    background-color: transparent;
+    border-radius: 8px 0 0 8px;
+}
+
+.user-card.Admin::before {
+    background-color: #bc3636;
+
+}
+
+.user-card.Student::before {
+    background-color: #36bc8d;
+}
+
+.user-card.Teacher::before {
+    background-color: #333dae;
+}
+
+.user-card .info {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.user-card .info h5.role {
+    font-size: 14px;
+    margin: 0;
+    color: #888;
+}
+
+.user-card .info h2.name {
+    font-size: 24px;
+    margin: 0;
+}
+
+.user-card .info h3.email {
+    font-size: 18px;
+    margin: 0;
+    color: #555;
+}
+
+.user-card .info p.createdAt {
+    font-size: 12px;
+    margin: 0 !important;
+    color: #aaa;
+}
+
+.actions{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    width: 30%;
+}
+
+
+/* Deletion styles */
+.confirmation {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 5px;
+}
+
+.actions button {
+    margin: 0;
+    width: auto;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.actions button.delete,
+.actions button.confirm{
+    background-color: #d80808;
+}
+
+.actions button.delete:hover{
+    background-color: #a10606;
+}
+
+.actions button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+
+/* Details styles */
+.details{
+    width: 100%;
+    background-color: #265dd4;
+    margin: 0;
+    padding: 10px 15px;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: background-color 0.3s;
+}
+
+.details:hover {
+    background-color: #1c459e;
+    color: #fff;
+}

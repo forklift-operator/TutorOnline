@@ -26,7 +26,6 @@ SignedRouter.get("/users/:id", verifyToken, async (req, res) => {
 })
 
 SignedRouter.get("/teachers", verifyToken, async (req, res) => {
-SignedRouter.get("/teachers", verifyToken, async (req, res) => {
     const collections = db.collection("users");
     const query = {role: "Teacher"};
     const options = {
@@ -50,7 +49,6 @@ SignedRouter.get("/teachers", verifyToken, async (req, res) => {
 
 })
 
-SignedRouter.get("/teachers/:id", verifyToken, async (req, res) => {
 SignedRouter.get("/teachers/:id", verifyToken, async (req, res) => {
     if (!ObjectId.isValid(req.params.id)) {
         return res.status(400).json({ message: "Invalid ID" });

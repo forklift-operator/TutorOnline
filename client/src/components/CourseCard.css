@@ -1,0 +1,90 @@
+.course-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: rgb(57, 57, 57);
+    height: 80%;
+    flex-shrink: 0;
+    width: 100%;
+    align-self: center;
+    border: solid 3px;
+}
+
+.course-card > h1 {
+    text-align: center;
+}
+
+.course-card .card-header {
+    font-size: 1.5rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.card-header .actions {
+    display: flex;
+    flex-direction: row;
+    width: fit-content;
+}
+
+.card-header .actions > button {
+    height: fit-content;
+    width: fit-content;
+    padding: 0;
+}
+
+
+
+button .fa-trash {
+    background-color: rgb(183, 0, 0);
+}
+
+button .fa-trash:hover {
+    background-color: rgb(130, 3, 3);
+}
+
+button .fa-edit {
+    background-color: rgb(30, 98, 192);
+}
+
+button .fa-edit:hover {
+    background-color: rgb(20, 70, 140);
+}
+
+button.join {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    width: fit-content;
+    font-size: 1.5rem;
+
+    align-self: center;
+    
+    .fa-headphones{
+        width: fit-content;
+        height: fit-content;
+    }
+
+    background-color: rgb(2, 143, 18);
+}
+
+button.join:hover {
+    background-color: rgb(2, 107, 14);
+}
+
+.new-lesson {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Add spacing between input fields */
+    width: 100%; /* Ensure it takes the full width of the parent */
+    box-sizing: border-box; /* Include padding and border in the width */
+
+    form {
+        display: flex;
+        flex-direction: column;
+    }
+}
