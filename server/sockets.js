@@ -1,4 +1,3 @@
-import { RoomModel } from "./db/models/RoomModel.js";
 import { CourseModel } from "./db/models/CourseModel.js";
 import { Server } from "socket.io";
 import { ObjectId } from "mongodb";

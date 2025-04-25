@@ -63,6 +63,11 @@ const CourseSchema = new mongoose.Schema({
         ref: "User",
         required: true,
     }],
+    waitingStudents: [{
+        type: mongoose.Types.ObjectId,
+        ref: "User",
+        required: true,
+    }],
     lessons: {type: [LessonSchema], default: []},
     
 })

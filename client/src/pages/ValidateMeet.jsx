@@ -20,7 +20,7 @@ export default function ValidateMeet({ status }) {
                 "token": Cookies.get('token'), 
                 "ngrok-skip-browser-warning": 1,
             },
-            method: ["GET"],
+            method: ["POST"],
         })
         .then(async res => {
             const data = await res.json();

@@ -1,9 +1,10 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 
-dotenv.config({ path: "./config.env" });
+dotenv.config({ path: "./.env" });
 
 const URI = process.env.ATLAS_URI || "";
+
 
 
 async function connectDB() {

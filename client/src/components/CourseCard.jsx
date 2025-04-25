@@ -28,19 +28,21 @@ export default function CourseCard({ status, course, onDelete, onCreateLesson, o
         }
     }
 
-    const handleJoinMeeting = (courseId, lessonId, isOpen=true) => {
-        onJoin(courseId, lessonId, isOpen);
+    const handleJoinMeeting = (courseId, lessonId, setOpen=false) => {
+        onJoin(courseId, lessonId, setOpen);
     }
 
   return (
     <div className="course-card">
         <div className="card-header">
             <h2 className="course-name">{course.name}</h2>
-            <div className="actions">
-                <button><i className="fa fa-user"></i></button>
-                <button><i className="fa fa-edit"></i></button>
-                <button onClick={() => onDelete(course._id)}><i className="fa fa-trash"></i></button>
-            </div>
+            {status.role === "Teacher" &&
+                <div className="actions">
+                    <button><i className="fa fa-user"></i></button>
+                    <button><i className="fa fa-edit"></i></button>
+                    <button onClick={() => onDelete(course._id)}><i className="fa fa-trash"></i></button>
+                </div>
+            }
         </div>
         <div className="description-container">
             <h3>Description</h3>
@@ -74,7 +76,7 @@ export default function CourseCard({ status, course, onDelete, onCreateLesson, o
                         <button onClick={() => handleJoinMeeting(course._id, course.lessons[0]._id)} className='join'>Join meeting for {course.lessons[0].name}</button>
                     
                     :
-                        <button onClick={() => handleJoinMeeting(course._id, course.lessons[0]._id)} className='join'>Make a meeting for {course.lessons[0].name}</button>
+                        <button onClick={() => handleJoinMeeting(course._id, course.lessons[0]._id, true)} className='join'>Make a meeting for {course.lessons[0].name}</button>
                     }
                 </div>
             }

@@ -138,18 +138,19 @@ export default function MyCoursesTeacher({ status }) {
     .catch(e => console.error(e));
   } 
 
-  const handleJoinLesson = (courseId, lessonId, isOpen) => {
-    if (isOpen) {
+  const handleJoinLesson = (courseId, lessonId, setOpen) => {
+    if (!setOpen) {
       navigate(`/meet/${courseId}/${lessonId}`);
     }else{
-      fetch(`${API_URL}/api/courses/${courseId}/lessons/${lessonId}/open`, {
+      fetch(`${API_URL}/api/courses/${courseId}/lessons/${lessonId}`, {
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
           "token": Cookies.get('token'), 
           "ngrok-skip-browser-warning": 1,
         },
-        method: ["POST"]
+        method: ["POST"],
+        body: JSON.stringify({ setOpen: true })
       })
       .then(async res => {
         const data = await res.json();
@@ -160,7 +161,9 @@ export default function MyCoursesTeacher({ status }) {
         
         navigate(`/meet/${courseId}/${lessonId}`);
       })
-
+      .catch(e => {
+        console.error(e)
+      })
     }
   }
 

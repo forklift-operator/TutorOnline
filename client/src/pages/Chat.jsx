@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { io } from "socket.io-client";
 import Peer from 'peerjs'
 import './Chat.css';
+import Cookies from 'js-cookie'
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Chat({ status }) {
@@ -75,7 +76,7 @@ export default function Chat({ status }) {
         });
     }
 
-    const handleLeave = () => {
+    const handleLeaveMeet = () => {
         if (socket) {
             socket.disconnect();
         }
@@ -85,7 +86,43 @@ export default function Chat({ status }) {
         }
 
         setJoined(false);
-        window.location.href = '/';
+
+        navigate(`/meet/${courseId}/${lessonId}`);
+
+    }
+    
+    const handleCloseMeet = () => {
+        if (socket) {
+            socket.disconnect();
+        }
+
+        if (peer) {
+            peer.destroy();
+        }
+
+        setJoined(false);
+
+        fetch(`${API_URL}/api/courses/${courseId}/lessons/${lessonId}`, {
+            headers: {
+              "Accept": "application/json",
+              "Content-Type": "application/json",
+              "token": Cookies.get('token'), 
+              "ngrok-skip-browser-warning": 1,
+            },
+            method: ["POST"],
+            body: JSON.stringify({ setOpen: false })
+        })
+        .then(async res => {
+            const data = await res.json();
+            
+            if (!res.ok) {
+            throw new Error(data.error);
+            }
+
+            
+        })
+        .catch(e => console.error(e))
+
     } 
 
     function handleJoin() {
@@ -244,7 +281,7 @@ export default function Chat({ status }) {
                     {!joined ? 
                         <button onClick={() => handleJoin()}>Join</button>
                     :
-                        <button onClick={() => handleLeave()}>Leave</button>}
+                        <button onClick={() => handleCloseMeet()}>Close Meet</button>}
                 </div>
             </div>
 

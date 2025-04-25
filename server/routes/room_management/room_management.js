@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { verifyToken, checkRole } from "../../middleware/authorisation.js";
 import { db } from "../../db/connect.js";
-import { RoomModel } from "../../db/models/RoomModel.js";
 import { CourseModel } from "../../db/models/CourseModel.js";
 import { ObjectId } from "mongodb";
 
@@ -77,37 +76,36 @@ CourseRouter.post("/courses/:courseId/lessons", verifyToken, checkRole("Teacher"
 });
 
 
-CourseRouter.get("/courses/:courseId/lessons/:lessonId", verifyToken, async (req, res) => {
-    if (!ObjectId.isValid(req.params.courseId) || !ObjectId.isValid(req.params.lessonId)){
-        return res.status(400).json({ error: "Course or lesson ID invalid" })
-    } 
-    
-    const collections = db.collection("courses");
-    
+CourseRouter.post("/courses/:courseId/lessons/:lessonId", verifyToken, async (req, res) => {
+    if (!ObjectId.isValid(req.params.courseId) || !ObjectId.isValid(req.params.lessonId)) {
+        return res.status(400).json({ error: "Course or lesson ID invalid" });
+    }
+
     try {
         const course = await CourseModel.findById(req.params.courseId);
-        if (!course) return res.status(404).json({ error: "Course(" + req.params.courseId + ") not found" })
+        if (!course) return res.status(400).json({ error: `Course(${req.params.courseId}) not found` });
+
         const lesson = course.lessons.find(lesson => lesson._id.toString() === req.params.lessonId);
-        if (!lesson) return res.status(404).json({ error: "Lesson(" + req.params.lessonId + ") not found" });
+        if (!lesson) return res.status(400).json({ error: `Lesson(${req.params.lessonId}) not found` });
 
-        return res.status(200).json(lesson);
-    } catch (e) {
-        console.log(e);
-        
-        return res.status(500).json({ error: "Server error: " + e });
-    }
-})
+        if (req.body.setOpen !== undefined) {
+            if (req.user.role !== "Teacher" || req.user.id !== course.teacher.toString()) {
+                return res.status(400).json({ error: "No permissions to modify this lesson" });
+            }
 
-CourseRouter.post("/create/room", verifyToken, checkRole("Teacher"), checkRole("Admin"), async (req, res) => {
-    // const query = { req.body };
-    
-    try {
-        const room = new RoomModel(req.body);
-        await room.save();
-        res.status(200).json({ roomId: room._id });
+            lesson.isOpen = req.body.setOpen; 
+            await course.save();
+            return res.status(200).json({ message: `Lesson ${req.body.setOpen ? "opened" : "closed"} successfully`, lesson });
+        } else {
+            if (!lesson.isOpen) {
+                return res.status(400).json({ error: "Lesson is not open yet" });
+            }
+
+            return res.status(200).json(lesson);
+        }
     } catch (e) {
-        res.status(500).json({ error: "Failed to create room " + e.message });
+        return res.status(500).json({ error: `Server error: ${e.message}` });
     }
-})
+});
 
 export { CourseRouter }

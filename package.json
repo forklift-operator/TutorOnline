@@ -1,0 +1,45 @@
+{
+  "name": "TutorOnline",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "devClient": "vite ./client",
+    "buildClient": "vite ./client build",
+    "lintClient": "eslint ./client",
+    "previewClient": "vite ./client preview",
+    "devServer": "nodemon ./server/server.js",
+    "testServer": "echo \"Error: no test specified\" && exit 1",
+    "startServer": "node ./server/server.js",
+    "start": "concurrently --kill-others-on-fail \"npm run startServer\" \"npm run startSlient\""
+  },
+  "dependencies": {
+    "js-cookie": "^3.0.5",
+    "peerjs": "^1.5.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^6.30.0",
+    "socket.io-client": "^4.8.1",
+
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.14.1",
+    "mongoose": "^8.12.1",
+    "nodemon": "^3.1.9",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.21.0",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.21.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^15.15.0",
+    "vite": "^6.2.0"
+  }
+}

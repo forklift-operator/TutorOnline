@@ -3,6 +3,7 @@ import { ObjectId } from "mongodb";
 import { verifyToken, checkRole } from "../../middleware/authorisation.js";
 import { db } from "../../db/connect.js";
 import { User, Report } from "../../db/models/UserModels.js";
+import { CourseModel } from "../../db/models/CourseModel.js";
 
 const SignedRouter = Router();
 
@@ -96,6 +97,18 @@ SignedRouter.post("/report", verifyToken, async (req, res) => {
         return res.status(500).json({ message: "Error reporting user", e })
     }
     
+})
+
+SignedRouter.get("/courses", verifyToken, async (req, res) => {
+    try {
+        const tags = req.body;
+        const courses = await CourseModel.find({}); // add tag seaching 
+    
+        return res.status(200).json(courses);
+
+    } catch(e) {
+        return res.status(500).json({ error: "Error getting the courses: " + e });
+    }
 })
 
 
