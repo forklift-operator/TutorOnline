@@ -24,3 +24,32 @@ The app is still in development so many features are missing but i'm working on 
 - Node.js (v16+)
 - MongoDB
 - npm/yarn
+
+## How to run
+1. Install dependencies:
+```
+sh
+npm install
+# or
+yarn install
+```
+
+2. Set up environment variables:
+```
+sh
+cp .env.example .env
+# Then edit .env with your credentials
+```
+
+3. Run the application:
+```
+sh
+npm start
+# or
+yarn start
+```
+
+4. Access the app:
+
+Frontend: http://localhost:5173
+Backend: http://localhost:8080
