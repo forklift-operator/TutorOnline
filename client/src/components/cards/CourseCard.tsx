@@ -1,4 +1,4 @@
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import type { ICourse } from '../../../../server/src/db/model/courseModel';
 import { Rating, RatingButton } from '../../components/ui/shadcn-io/rating';
 import { Card, CardDescription, CardTitle } from '../ui/card';
@@ -13,9 +13,11 @@ type Props = {
 }
 
 export default function CourseCard({course, onDelete, view='STUDENT' }: Props) {
-  return (
+    const navigate = useNavigate();
     
-        <Card className='bg-background text-foreground pt-0 overflow-hidden'>
+    return (
+    
+        <Card onClick={() => navigate(`/courses/${course._id.toString()}`)} className='bg-background text-foreground pt-0 overflow-hidden'>
             <div className="relative w-full">
 
                 <img 
@@ -49,7 +51,6 @@ export default function CourseCard({course, onDelete, view='STUDENT' }: Props) {
 
             <Label className='px-5'>Students enrolled: {course.students?.length}</Label>
 
-            <Link className='px-5' to={`/courses/${course._id.toString()}`}>More...</Link>
             {course.currentLessonId && 
                 <Link className={'join'} to={`/meet/${course.currentLessonId.toString()}`}>Join latest lesson</Link>
             }

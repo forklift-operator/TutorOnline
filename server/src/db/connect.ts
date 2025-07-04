@@ -1,7 +1,5 @@
-import { ConnectOptions } from './../../node_modules/mongodb/src/sdam/topology';
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import { UserDTO } from '../../../client/src/dtos/userDTO';
 
 dotenv.config();
 

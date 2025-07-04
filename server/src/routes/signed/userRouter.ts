@@ -18,6 +18,8 @@ userRouter.get('/teachers', validateToken, async (req, res): Promise<any> => {
     }
 }).get('/teachers/:id', validateToken, async (req, res): Promise<any> => {
     try {
+        console.log(req.params);
+        
         const teacher = await UserModel.findById(req.params.id);
         if (!teacher) return res.status(404).json({ message: 'Could not find user' });
         return res.status(200).json(teacher);
@@ -32,8 +34,6 @@ userRouter.get('/teachers', validateToken, async (req, res): Promise<any> => {
         if (queryName) {
             filter = queryName ? { name: { $regex: queryName, $options: 'i' } } : {};
         } else filter = req.query;
-        console.log(req.query);
-
 
         const courses = await CourseModel.find(filter);
         return res.status(200).json(courses);
@@ -58,7 +58,7 @@ userRouter.get('/teachers', validateToken, async (req, res): Promise<any> => {
         console.error((e as Error).message);
         return res.status(500).json({ message: "Internal server error" })
     }
-}).delete('/courses/:courseId', validateToken, checkRole(['teacher']), async (req, res): Promise<any> => {
+}).delete('/courses/:courseId', validateToken, checkRole(['teacher', 'admin']), async (req, res): Promise<any> => {
     try {
         const deleted = await CourseModel.deleteOne({ _id: req.params.courseId });
         return res.status(200).json(deleted);

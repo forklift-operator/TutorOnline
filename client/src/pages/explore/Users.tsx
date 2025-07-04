@@ -40,9 +40,8 @@ export default function Users({ fetchUsers, onDelete, onEditUser }: Props) {
         
         try {
             if (!onEditUser) return;
-            console.log('asd');
             const updated = await onEditUser('user', updatedUser);
-            console.log(updated);
+            console.log(updatedUser);
             
             setUsers(users.map(user => user._id === updatedUser._id ? { ...user, ...updatedUser } : user));
         } catch (e) {

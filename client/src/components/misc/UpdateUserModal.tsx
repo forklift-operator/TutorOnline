@@ -1,123 +1,122 @@
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { useState } from "react"
+
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useEffect, useState } from "react";
-import { defaultCourseImg } from "@/common/commonTypes";
-import type { IUser } from "../../../../server/src/db/model/userModel";
+import type { IUser } from "../../../../server/src/db/model/userModel"
+
+const UserEditSchema = z.object({
+    name: z.string().optional(),
+    username: z.string().optional(),
+    bio: z.string().optional(),
+    email: z.string().optional(),
+    imageUrl: z.string().optional(),
+})
+
+type UserEditData = z.infer<typeof UserEditSchema>
 
 type Props = {
+    onEdit: (user: IUser) => Promise<void>,
     user: IUser;
-    onEditUser: (newUser: IUser) => Promise<void>;
     className?: string;
 }
 
-export function UpdateUserModal({ user, onEditUser, className }:Props) {
-    const [open, setOpen] = useState(false);
-    const [username, setUsername] = useState('')
-    const [name, setName] = useState('')
-    const [bio, setBio] = useState('')
-    const [imageUrl, setImgUrl] = useState('')
-  
-    useEffect(() => {
-        if (open) {
-            setName(user.name)
-            setUsername(user.username)
-            setBio(user.bio || '')
-            setImgUrl(user.imageUrl || defaultCourseImg)
-        }
-    }, [open])
-    
-    const handleSubmit = async () => {
-        await onEditUser({ ...user, name, imageUrl });
-        setOpen(false);
-        setName('');
-        setUsername('');
-        setBio('');
-        setImgUrl('')
-    };
+export function UpdateUserModal({ user, onEdit, className }: Props) {
+  const [open, setOpen] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-    const handleCancel = () => {
-        setName('');
-        setUsername('');
-        setBio('');
-        setImgUrl('')
+  const form = useForm<UserEditData>({
+    resolver: zodResolver(UserEditSchema),
+    defaultValues: {
+      username: user.username,
+      name: user.name,
+      bio: user.bio,
+      email: user.email,
+      imageUrl: user.imageUrl,
+    },
+  })
+
+  const handleSubmit = async (data: UserEditData) => {
+    try {
+      await onEdit({...user, ...data})
+      setOpen(false)
+      setError(null)
+    } catch (e) {
+      setError((e as Error).message)
     }
+  }
 
-    return (
-        <Dialog open={open} onOpenChange={setOpen}>
-        <form>
-            <DialogTrigger asChild className={className}>
-            <Button size={'lg'}>Edit</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-                <DialogTitle>Edit user</DialogTitle>
-                <DialogDescription>
-                    Here you can edit users. Set new name, bio, image url and then click edit when you're done.
-                </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4">
-                <div className="grid gap-3">
-                    <Label htmlFor="name-1">Name</Label>
-                    <Input
-                        id="name-1"
-                        name="name"
-                        value={name}
-                        onChange={e => setName(e.target.value)}
-                        placeholder="John Doe"
-                        required
-                        />
-                </div>
-                <div className="grid gap-3">
-                    <Label htmlFor="username-1">Username</Label>
-                    <Input
-                    id="username-1"
-                    name="username"
-                    value={username}
-                    onChange={e => setUsername(e.target.value)}
-                    placeholder="johndoe123"
-                    />
-                </div>
-                <div className="grid gap-3">
-                    <Label htmlFor="bio-1">Bio</Label>
-                    <textarea
-                        id="bio-1"
-                        name="bio"
-                        value={bio}
-                        onChange={e => setBio(e.target.value)}
-                        className="text-wrap border rounded px-3 py-2 focus:outline-none focus:ring w-full min-h-[80px] resize-y"
-                        placeholder="Short description of the user"
-                        />
-                </div>
-                <div className="grid gap-3">
-                    <Label htmlFor="imageUrl-1">Image URL</Label>
-                     <Input
-                        id="imageUrl-1"
-                        name="imageUrl"
-                        value={imageUrl}
-                        onChange={e => setImgUrl(e.target.value)}
-                        placeholder="Profile pic of the user"
-                    />
-                </div>
-            </div>
-            <DialogFooter>
-                <DialogClose asChild>
-                <Button onClick={handleCancel} variant="outline">Cancel</Button>
-                </DialogClose>
-                <Button onClick={handleSubmit} type="submit">Save</Button>
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button>Edit</Button>
+      </DialogTrigger>
+      <DialogContent className={`sm:max-w-[425px] ${className}`}>
+        <DialogHeader>
+          <DialogTitle className="text-xl">Edit user</DialogTitle>
+          {error && (
+            <Button variant="destructive" disabled>
+              {error}
+            </Button>
+          )}
+        </DialogHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input placeholder="user123" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input type="text" placeholder="John Doe" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <DialogFooter className="pt-4">
+              <DialogClose asChild>
+                <Button variant="outline">Cancel</Button>
+              </DialogClose>
+              <Button type="submit">Login</Button>
             </DialogFooter>
-            </DialogContent>
-        </form>
-        </Dialog>
-    )
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  )
 }

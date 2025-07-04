@@ -5,19 +5,21 @@ import { defaultUserImg } from '@/common/commonTypes';
 import { Label } from '../ui/label';
 import { Badge } from '../ui/badge';
 import { UserCardActionsDropdown } from '../misc/UserCardActionsDropdown';
+import { useNavigate } from 'react-router';
 
 type Props = {
   user: IUser,
-  myId: string,
+  myId?: string,
   onDelete?: (userId: string) => Promise<void>,
   onEditUser?: (newUser: IUser) => Promise<void>;
   adminView?: boolean,
 }
 
 export default function UserCard({ user, myId, onDelete, onEditUser, adminView=false }: Props) {
+  const navigate = useNavigate();
 
   return (
-        <Card className='bg-background gap-5 text-foreground pt-0 overflow-hidden py-5 px-5'>
+        <Card onClick={() => navigate(`/${adminView ? 'users' : 'teachers'}/${user._id.toString()}`)} className='bg-background gap-5 text-foreground pt-0 overflow-hidden py-5 px-5'>
             {adminView ?
               <div className="flex flex-row gap-2">
                 {myId === user._id.toString() && 

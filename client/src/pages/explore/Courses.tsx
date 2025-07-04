@@ -3,14 +3,18 @@ import type { ICourse } from '../../../../server/src/db/model/courseModel';
 import CourseCard from '@/components/cards/CourseCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import type { IUser } from '../../../../server/src/db/model/userModel';
+import Cookies from 'js-cookie';
 
 type Props = {
     fetchCourses: (entityType: string, filter?: Record<string, any>) => Promise<ICourse[]>;
+    onDelete: (entityType: string, id: string) => Promise<ICourse>,
 }
 
-export default function Courses({ fetchCourses }: Props) {
+export default function Courses({ fetchCourses, onDelete }: Props) {
 
     const [courses, setCourses] = useState<ICourse[]>([])
+    const adminView = (JSON.parse(Cookies.get('user') || '') as IUser).roles.includes('admin');
     
     const fetch = async (filter?: Record<string, any>) => {
         try {
@@ -21,6 +25,15 @@ export default function Courses({ fetchCourses }: Props) {
         }
     }
     
+     const handleDeleteCourse = async (courseId: string) => {
+        try {
+        await onDelete('course', courseId);
+        setCourses(courses.filter(course => course._id.toString() !== courseId));
+        } catch (e) {
+        console.error((e as Error).message);
+        }
+    }
+
     useEffect(() => {
         fetch();
     }, [])
@@ -46,7 +59,7 @@ export default function Courses({ fetchCourses }: Props) {
         
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {courses.map((course) => (
-                <CourseCard key={course._id.toString()} course={course} />
+                <CourseCard key={course._id.toString()} course={course} view={adminView ? 'TEACHER' : 'STUDENT'} onDelete={handleDeleteCourse}/>
             ))}
         </div>
     </div>

@@ -30,7 +30,8 @@ import Courses from "./pages/explore/Courses.js";
 function Home() {
   return(
     <div className="section">
-      <h1>Home</h1>
+      <h1 className="mb-4">Tutor Online</h1>
+      <p className="w-[500px]">A web-based platform where students can join live tutoring sessions with teachers. The system allows teachers to schedule lessons, students to join, and real-time interaction via video, chat, and shared whiteboards.</p>
     </div>
   ) 
 }
@@ -125,16 +126,16 @@ export default function App() {
           <Route>
             <Route element={<ProtectedRoute user={user!} isAllowed={!!user && user.roles.includes('admin')} apiClient={apiClient}/>}>
               <Route path="users" element={<Users fetchUsers={fetchEntitys} onDelete={deleteEntity} onEditUser={updateEntity}/>} />
-              <Route path="users/:id" element={<Users fetchUsers={fetchEntitys} onDelete={deleteEntity} onEditUser={updateEntity}/>} />
+              <Route path="users/:id" element={<UserDetails onFetch={fetchEntity} onUpdate={updateEntity} view='ADMIN' />} />
             </Route>
           </Route>
 
           {/* general */}
           <Route element={<ProtectedRoute user={user!} apiClient={apiClient}/>}>
-            <Route path='courses' element={ <Courses fetchCourses={fetchEntitys}/>} />
+            <Route path='courses' element={ <Courses fetchCourses={fetchEntitys} onDelete={deleteEntity}/>} />
             <Route path='teachers' element={ <Teachers fetchTeachers={fetchEntitys}/>} />
             <Route path='teachers/:id' element={<UserDetails onFetch={fetchEntity} onUpdate={updateEntity} view='USER' />} />
-            <Route path="courses/:id" element={ <CourseDetails onFetchCourse={fetchEntity} onDeleteLesson={deleteEntity} onFetchLessons={fetchEntitys} onCreateLesson={createEntity} onUpdateCourse={updateEntity} onStartMeet={handleStartMeet}/> } />
+            <Route path="courses/:id" element={ <CourseDetails onFetchCourse={fetchEntity} onDeleteLesson={deleteEntity} onFetchLessons={fetchEntitys} onCreateLesson={createEntity} onUpdateCourse={updateEntity} onStartMeet={handleStartMeet} onFetchTeacher={fetchEntity}/> } />
           </Route>
 
           {/* teacher */}

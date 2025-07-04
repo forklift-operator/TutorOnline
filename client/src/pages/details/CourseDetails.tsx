@@ -9,9 +9,12 @@ import Lessons from "./Lessons";
 import type { IUser } from "../../../../server/src/db/model/userModel";
 import Cookies from "js-cookie";
 import { UpdateCourseModal } from "@/components/misc/UpdateCourseModal";
+import UserCard from "@/components/cards/UserCard";
+import { Button } from "@/components/ui/button";
 
 type Props = { 
     onFetchCourse: (entityType: string, id: string) => Promise<ICourse>,
+    onFetchTeacher: (entityType: string, id: string) => Promise<IUser>,
     onFetchLessons: (entityType: string, filter?: Record<string, any>) => Promise<ILesson[]>,
     onUpdateCourse?: (entityType: string, updated: ICourse) => Promise<ICourse>,
     onCreateLesson: (entityType: string, entity: Omit<ILesson, '_id'>) => Promise<ILesson>,
@@ -19,13 +22,14 @@ type Props = {
     onStartMeet?: (id: string) => Promise<void>;
 }
 
-export default function CourseDetails({ onFetchCourse, onFetchLessons, onUpdateCourse, onCreateLesson, onDeleteLesson, onStartMeet}: Props) {
+export default function CourseDetails({ onFetchCourse, onFetchLessons, onUpdateCourse, onCreateLesson, onDeleteLesson, onStartMeet, onFetchTeacher}: Props) {
     const { id } = useParams<string>();
     const [course, setCourse] = useState<ICourse | null>(null);
+    const [teacher, setTeacher] = useState<IUser | null>(null)
     const [lessons, setLessons] = useState<ILesson[]>([])
     const [loading, setLoading] = useState(true);
     
-    const [owner, setowner] = useState(false)
+    const [owner, setOwner] = useState(false)
     const myId = (JSON.parse(Cookies.get('user') || '') as IUser)._id;
 
     const createLesson = async (lesson: Omit<ILesson, '_id'>) => {
@@ -58,10 +62,9 @@ export default function CourseDetails({ onFetchCourse, onFetchLessons, onUpdateC
     
     const fetchCourse = async () => {
         try {
-            
             const course = await onFetchCourse('course', id!)
             if (course) {
-                setowner(myId.toString() === course.teacher.toString())
+                setOwner(myId.toString() === course.teacher.toString())
                 setCourse(course);
             }
         } catch (e) {
@@ -69,8 +72,17 @@ export default function CourseDetails({ onFetchCourse, onFetchLessons, onUpdateC
         } finally {
             setLoading(false);
         }
+    }
 
-
+    const fetchTeacher = async () => {
+        try {
+            const teacher = await onFetchTeacher('teacher', course!.teacher.toString())
+            if (teacher) {
+                setTeacher(teacher);
+            }
+        } catch (e) {
+            console.error((e as Error).message);
+        } 
     }
 
     const fetchLessons = async () => {
@@ -88,6 +100,7 @@ export default function CourseDetails({ onFetchCourse, onFetchLessons, onUpdateC
 
     useEffect(() => {
         if (!course) return;
+        fetchTeacher();
         fetchLessons();
     }, [course])
 
@@ -123,12 +136,19 @@ export default function CourseDetails({ onFetchCourse, onFetchLessons, onUpdateC
 
     {/* Course Body */}
     <div className="w-full flex flex-row gap-5 h-[600px] p-5">
-            <div className="flex-3 flex flex-col w-2/3 text-pretty">
-                <Label className="mb-2 text-lg">Description:</Label>
+        <div className="flex-3 flex flex-col gap-5 w-2/3 text-pretty">
+            <div className="flex flex-col gap-0">
+                <Label className="flex flex-col text-sm brightness-60">Description:</Label>
                 <p>{course.description}</p>
             </div>
 
-        <div className="w-px bg-gray-600" />
+            {teacher ? 
+                <UserCard user={teacher}/>
+            :
+                <Button variant={'destructive'} disabled>Error fetching teacher</Button>
+            }
+        </div>
+
         
         <div className="flex-2 flex flex-col">
             <p className="text-3xl mb-3">Lessons</p>

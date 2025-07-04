@@ -1,6 +1,5 @@
 import { ObjectId } from 'mongodb';
 import jwt from 'jsonwebtoken';
-import { UserDTO } from '../../../../client/src/dtos/userDTO';
 import express from 'express'
 import { checkRole, validateToken } from '../../middleware/validateToken';
 import { IUser, UserModel } from '../../db/model/userModel';
@@ -89,7 +88,7 @@ authRouter.post('/login', async (req, res): Promise<any> => {
 
     return res.status(200).json({ message: 'Logout successfull' })
 
-}).post('/validate-meet', validateToken, checkRole(['student', 'admin']), async (req, res): Promise<any> => {
+}).post('/validate-meet', validateToken, async (req, res): Promise<any> => {
     
     try {
         if (!ObjectId.isValid(req.body.id)) return res.status(404).json({message: 'Lesson id not valid'});  
