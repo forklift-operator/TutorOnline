@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -35,12 +35,12 @@ const UserEditSchema = z.object({
 type UserEditData = z.infer<typeof UserEditSchema>
 
 type Props = {
-    onEdit: (user: IUser) => Promise<void>,
+    onEditUser: (user: IUser) => Promise<void>,
     user: IUser;
     className?: string;
 }
 
-export function UpdateUserModal({ user, onEdit, className }: Props) {
+export function UpdateUserModal({ user, onEditUser, className }: Props) {
   const [open, setOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -57,7 +57,7 @@ export function UpdateUserModal({ user, onEdit, className }: Props) {
 
   const handleSubmit = async (data: UserEditData) => {
     try {
-      await onEdit({...user, ...data})
+      await onEditUser({...user, ...data})
       setOpen(false)
       setError(null)
     } catch (e) {
@@ -68,7 +68,7 @@ export function UpdateUserModal({ user, onEdit, className }: Props) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Edit</Button>
+        <Button size={'lg'}>Edit</Button>
       </DialogTrigger>
       <DialogContent className={`sm:max-w-[425px] ${className}`}>
         <DialogHeader>
@@ -108,11 +108,40 @@ export function UpdateUserModal({ user, onEdit, className }: Props) {
                 </FormItem>
               )}
             />
+            
+            <FormField
+              control={form.control}
+              name="bio"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Bio</FormLabel>
+                  <FormControl>
+                    <Input type="text" placeholder="Shord description of the user" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="imageUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Image URL</FormLabel>
+                  <FormControl>
+                    <Input type="text" placeholder="Profile pic" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <DialogFooter className="pt-4">
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
               </DialogClose>
-              <Button type="submit">Login</Button>
+              <Button type="submit">Done</Button>
             </DialogFooter>
           </form>
         </Form>
